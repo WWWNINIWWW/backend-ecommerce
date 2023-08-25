@@ -1,0 +1,12 @@
+from orders.models import Order, Feedback
+from rest_framework import serializers
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['seller_id','consumer_id','product_id','zip_code_fate','price_fate','price_total','quantity_buy']
+        
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['consumer_id','product_id','assessment','comentary']
