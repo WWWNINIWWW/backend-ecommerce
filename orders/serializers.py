@@ -2,9 +2,11 @@ from orders.models import Order, Feedback
 from rest_framework import serializers
 
 class OrderSerializer(serializers.ModelSerializer):
+    price_fate = serializers.ReadOnlyField()
+    price_total = serializers.ReadOnlyField()
     class Meta:
         model = Order
-        fields = ['seller_id','consumer_id','product_id','zip_code_fate','price_fate','price_total','quantity_buy']
+        fields = ['order_id','seller_id','consumer_id','product_id','zip_code_fate','price_fate','price_total','quantity_buy']
         
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
