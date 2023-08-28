@@ -4,6 +4,8 @@ from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from users.models import User
 from products.models import Products
+from django.utils import timezone
+from datetime import timedelta,datetime
 
 class OrdersList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
@@ -18,8 +20,9 @@ class OrdersList(generics.ListCreateAPIView):
         product = Products.objects.get(product_id=product_id)
         order_data = {field: value for field, value in self.request.data.items() if field != 'seller_id' and field != 'consumer_id' and field != 'product_id' and field != 'price_total'}
         price_fate, deadline = Freight(product.zip_code_origin, order_data['zip_code_fate'],product.weight,product.length,product.height,product.width)
+        deadline = datetime.date(timezone.now())+timedelta(int(deadline))
         price_total = product.price + price_fate
-        order = Order.objects.create(seller_id=seller_id,consumer_id=consumer_id,product_id=product_id,price_total=price_total,price_fate=price_fate, **order_data)
+        order = Order.objects.create(seller_id=seller_id,consumer_id=consumer_id,product_id=product_id,price_total=price_total,price_fate=price_fate,deadline=deadline, **order_data)
         return order
 
 class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):

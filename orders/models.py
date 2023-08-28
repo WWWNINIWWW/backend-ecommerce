@@ -9,6 +9,9 @@ class Order(models.Model):
     price_fate = models.DecimalField(default=0.00,decimal_places=2,max_digits=20)
     price_total = models.DecimalField(default=0.00,decimal_places=2,max_digits=20)
     quantity_buy = models.IntegerField(default=0,null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+    deadline = models.DateField()
 
 class Feedback(models.Model):
     consumer_id = models.IntegerField(unique=True,null=False)
