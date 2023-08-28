@@ -2,7 +2,7 @@ from django.db import models
 
 class Products(models.Model):
     name_product = models.CharField(max_length=255)
-    user_id = models.IntegerField(unique=True,null=False)
+    user_id = models.IntegerField(null=False)
     product_id = models.IntegerField(unique=True,null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -13,3 +13,7 @@ class Products(models.Model):
     assessment = models.TextField(default="", null=False)
     specifications = models.TextField(default="", null=False)
     zip_code_origin = models.IntegerField(default=0,null=False)
+    weight = models.IntegerField(default=0,null=False)
+    length = models.IntegerField(default=0,null=False)
+    height = models.IntegerField(default=0,null=False)
+    width = models.IntegerField(default=0,null=False)
