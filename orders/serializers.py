@@ -16,4 +16,4 @@ class OrderSerializer(serializers.ModelSerializer):
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
-        fields = ['consumer_id','product_id','assessment','comentary']
+        fields = ['feedback_id','consumer_id','product_id','assessment','comentary']

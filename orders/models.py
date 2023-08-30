@@ -17,6 +17,7 @@ class Order(models.Model):
     tracking_code = models.TextField(default="")
 
 class Feedback(models.Model):
+    feedback_id = models.IntegerField(unique=True)
     consumer_id = models.IntegerField(unique=True,null=False)
     product_id = models.IntegerField(unique=True,null=False)
     assessment = models.IntegerField(default=0,null=False)

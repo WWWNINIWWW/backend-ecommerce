@@ -68,6 +68,10 @@ class FeedbacksList(generics.ListCreateAPIView):
 class FeedbacksDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+    def get_object(self):
+        feedback_id = self.kwargs['feedback_id']
+        feedback = get_object_or_404(Feedback,feedback_id=feedback_id)
+        return feedback
     
 def Freight(Zip_code_origin,Zip_code_destination,Weight,Length,Height,Width):
     from requests import post
