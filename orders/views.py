@@ -6,6 +6,9 @@ from users.models import User
 from products.models import Products
 from django.utils import timezone
 from datetime import timedelta,datetime
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.response import Response
 
 class OrdersList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
@@ -32,7 +35,29 @@ class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
         order_id = self.kwargs['order_id']
         order = get_object_or_404(Order,order_id=order_id)
         return order
-    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.tracking_code != "" and not instance.concluded:
+            import requests
+            headers,payload = {},{}
+            codigo = instance.tracking_code
+            url = f"https://api.linketrack.com/track/json?user=teste&token=1abcd00b2731640e886fb41a8a9671ad1434c599dbaa0a0de9a5aa619f29a83f&codigo={codigo}"
+            cond = True
+            while(cond):
+                response = requests.request("GET", url, headers=headers, data = payload)
+                if response.status_code == 200:
+                    json = response.json()
+                    if 'eventos' in json and len(json['eventos']) > 0:
+                        primeiro_evento = json['eventos'][0]
+                        primeiro_status = primeiro_evento['status']
+                        cond = False
+                        print(str(primeiro_status))
+                        if str(primeiro_status) == 'Objeto entregue ao destinatário':
+                            instance.concluded = True
+                            instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 class FeedbacksList(generics.ListCreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
@@ -40,7 +65,6 @@ class FeedbacksList(generics.ListCreateAPIView):
 class FeedbacksDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    
     
 def Freight(Zip_code_origin,Zip_code_destination,Weight,Length,Height,Width):
     from requests import post
@@ -72,3 +96,31 @@ def Freight(Zip_code_origin,Zip_code_destination,Weight,Length,Height,Width):
     else:
         print("Erro na solicitação:", response.status_code)
         print(response.content)
+
+@receiver(post_save, sender=Order)
+def after_save_order(sender, instance, created, **kwargs):
+    if not created:
+        if instance.tracking_code != "" and instance.concluded == False:
+            import requests
+            headers,payload = {},{}
+            codigo = instance.tracking_code
+            url = f"https://api.linketrack.com/track/json?user=teste&token=1abcd00b2731640e886fb41a8a9671ad1434c599dbaa0a0de9a5aa619f29a83f&codigo={codigo}"
+            cond = True
+            while(cond):
+                response = requests.request("GET", url, headers=headers, data = payload)
+                if response.status_code == 200:
+                    json = response.json()
+                    if 'eventos' in json and len(json['eventos']) > 0:
+                        primeiro_evento = json['eventos'][0]
+                        primeiro_status = primeiro_evento['status']
+                        cond = False
+                        print(str(primeiro_status))
+                        if str(primeiro_status) == 'Objeto entregue ao destinatário':
+                            instance.concluded = True
+                            instance.save()
+                            return instance
+    if instance.posted:
+        product = Products.objects.get(product_id=instance.product_id)
+        product.quantity-=1
+        product.save()
+        return product

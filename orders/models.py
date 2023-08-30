@@ -12,6 +12,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     deadline = models.DateField()
+    concluded = models.BooleanField(default=False)
+    posted = models.BooleanField(default=False)
+    tracking_code = models.TextField(default="")
 
 class Feedback(models.Model):
     consumer_id = models.IntegerField(unique=True,null=False)
