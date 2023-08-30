@@ -1,6 +1,6 @@
 from orders.models import Order, Feedback
 from orders.serializers import OrderSerializer, FeedbackSerializer
-from rest_framework import generics
+from rest_framework import generics,status
 from django.shortcuts import get_object_or_404
 from users.models import User
 from products.models import Products
@@ -13,20 +13,24 @@ from rest_framework.response import Response
 class OrdersList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    def perform_create(self,serializer):
+    def create(self, request, *args, **kwargs):
         seller_id = self.request.data.get('seller_id')
         consumer_id = self.request.data.get('consumer_id')
         product_id = self.request.data.get('product_id')
+        quantity_buy = self.request.data.get('quantity_buy')
         generics.get_object_or_404(User, user_id=seller_id)
         generics.get_object_or_404(User, user_id=consumer_id)
         generics.get_object_or_404(Products, product_id=product_id)
         product = Products.objects.get(product_id=product_id)
+        if product.quantity < int(quantity_buy) or product.quantity <=0:
+            return Response({"error": "Insufficient quantity available for purchase."}, status=status.HTTP_401_UNAUTHORIZED)
         order_data = {field: value for field, value in self.request.data.items() if field != 'seller_id' and field != 'consumer_id' and field != 'product_id' and field != 'price_total'}
         price_fate, deadline = Freight(product.zip_code_origin, order_data['zip_code_fate'],product.weight,product.length,product.height,product.width)
         deadline = datetime.date(timezone.now())+timedelta(int(deadline))
         price_total = product.price + price_fate
         order = Order.objects.create(seller_id=seller_id,consumer_id=consumer_id,product_id=product_id,price_total=price_total,price_fate=price_fate,deadline=deadline, **order_data)
-        return order
+        serializer = self.get_serializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
@@ -51,7 +55,6 @@ class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
                         primeiro_evento = json['eventos'][0]
                         primeiro_status = primeiro_evento['status']
                         cond = False
-                        print(str(primeiro_status))
                         if str(primeiro_status) == 'Objeto entregue ao destinatário':
                             instance.concluded = True
                             instance.save()
@@ -114,7 +117,6 @@ def after_save_order(sender, instance, created, **kwargs):
                         primeiro_evento = json['eventos'][0]
                         primeiro_status = primeiro_evento['status']
                         cond = False
-                        print(str(primeiro_status))
                         if str(primeiro_status) == 'Objeto entregue ao destinatário':
                             instance.concluded = True
                             instance.save()
