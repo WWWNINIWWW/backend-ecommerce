@@ -8,6 +8,9 @@ class OrderSerializer(serializers.ModelSerializer):
     modified_at = serializers.ReadOnlyField()
     deadline = serializers.ReadOnlyField()
     concluded = serializers.ReadOnlyField()
+    seller_id = serializers.ReadOnlyField()
+    consumer_id = serializers.ReadOnlyField()
+    product_id = serializers.ReadOnlyField()
     
     class Meta:
         model = Order
