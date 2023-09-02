@@ -18,7 +18,7 @@ class Order(models.Model):
 
 class Feedback(models.Model):
     feedback_id = models.IntegerField(unique=True)
-    consumer_id = models.IntegerField(unique=True,null=False)
-    product_id = models.IntegerField(unique=True,null=False)
-    assessment = models.IntegerField(default=0,null=False)
+    consumer_id = models.IntegerField(null=False)
+    product_id = models.IntegerField(null=False)
+    assessment = models.DecimalField(default=0.0,decimal_places=1,max_digits=2)
     comentary = models.TextField(default="", null=False)

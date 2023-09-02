@@ -64,7 +64,14 @@ class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
 class FeedbacksList(generics.ListCreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    
+    def create(self, request, *args, **kwargs):
+        assessment = int(self.request.data.get('assessment'))
+        if assessment >=0 and assessment <=5:
+            feedback_data = {field: value for field, value in self.request.data.items()}
+            feedback = Feedback.objects.create(**feedback_data)
+            serializer = self.get_serializer(feedback)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 class FeedbacksDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer

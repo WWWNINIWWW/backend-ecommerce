@@ -10,7 +10,7 @@ class Products(models.Model):
     sale = models.DecimalField(default=0.00, decimal_places=2,max_digits=4)
     quantity = models.IntegerField(default=0,null=False)
     description = models.TextField(default="", null=False)
-    assessment = models.TextField(default="", null=False)
+    assessment = models.IntegerField(default=0,null=False)
     specifications = models.TextField(default="", null=False)
     zip_code_origin = models.IntegerField(default=0,null=False)
     weight = models.IntegerField(default=0,null=False)
