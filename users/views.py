@@ -48,6 +48,21 @@ class CartProductAdd(generics.UpdateAPIView):
         serializer = self.get_serializer(cart)
         return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
     
+class CartProductRemove(generics.UpdateAPIView):
+    queryset=Cart.objects.all()
+    serializer_class = CartSerializer
+    def put(self, request, *args, **kwargs):
+        user_id = self.kwargs['user_id']
+        product_id = self.kwargs['product_id']
+        product = get_object_or_404(Products,product_id=product_id)
+        cart = get_object_or_404(Cart,user_id=user_id)
+        if str(product.product_id) in cart.shoppingcart:
+            del cart.shoppingcart[str(product.product_id)]
+            cart.save()
+            serializer = self.get_serializer(cart)
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+        return (Response(status=status.HTTP_404_NOT_FOUND))
+    
 @receiver(pre_delete, sender=User)
 def before_delete_user(sender, instance, **kwargs):
     try:
