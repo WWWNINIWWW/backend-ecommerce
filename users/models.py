@@ -8,5 +8,5 @@ class User(models.Model):
     
 class Cart(models.Model):
     user_id = models.IntegerField(unique=True,null=False)
-    shoppingcart = models.JSONField(null=True)
+    shoppingcart = models.JSONField(default=dict)
     modified_at = models.DateTimeField(auto_now=True)

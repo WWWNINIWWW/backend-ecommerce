@@ -32,6 +32,22 @@ class CartDetailChangeAndDelete(generics.RetrieveAPIView):
         cart = get_object_or_404(Cart,user_id=user_id)
         return cart
     
+class CartProductAdd(generics.UpdateAPIView):
+    queryset=Cart.objects.all()
+    serializer_class = CartSerializer
+    def put(self, request, *args, **kwargs):
+        user_id = self.kwargs['user_id']
+        product_id = self.kwargs['product_id']
+        quantity = int(self.request.data.get('quantity'))
+        product = get_object_or_404(Products,product_id=product_id)
+        cart = get_object_or_404(Cart,user_id=user_id)
+        if quantity > product.quantity:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        cart.shoppingcart[product.product_id] = quantity
+        cart.save()
+        serializer = self.get_serializer(cart)
+        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+    
 @receiver(pre_delete, sender=User)
 def before_delete_user(sender, instance, **kwargs):
     try:
