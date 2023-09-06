@@ -7,6 +7,6 @@ class User(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     
 class Cart(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
-    shoppingcart = models.JSONField()
+    user_id = models.IntegerField(unique=True,null=False)
+    shoppingcart = models.JSONField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
