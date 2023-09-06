@@ -9,3 +9,4 @@ class User(models.Model):
 class Cart(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE)
     shoppingcart = models.JSONField()
+    modified_at = models.DateTimeField(auto_now=True)
