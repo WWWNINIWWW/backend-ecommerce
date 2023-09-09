@@ -67,16 +67,14 @@ class CartProductRemove(generics.UpdateAPIView):
 def before_delete_user(sender, instance, **kwargs):
     try:
         user_id = instance.user_id
-        products = Products.objects.all()
+        products = Products.objects.filter(user_id=user_id)
         orders = Order.objects.all()
         for product in products:
-            if product.user_id == user_id:
-                product.delete()
+            product.delete()
         for order in orders:
             if order.seller_id == user_id or order.consumer_id == user_id:
                 order.delete()
         cart = Cart.objects.filter(user_id=user_id).first().delete()
-        return product,order,cart
     except:
         pass
 
