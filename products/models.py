@@ -1,7 +1,7 @@
 from django.db import models
 
 def custom_upload_to(instance, filename):
-    return f'media/{filename}'
+    return f'media/{instance.product.product_id}-{filename}'
 
 class Products(models.Model):
     name_product = models.CharField(max_length=255)
@@ -20,4 +20,8 @@ class Products(models.Model):
     length = models.IntegerField(default=0,null=False)
     height = models.IntegerField(default=0,null=False)
     width = models.IntegerField(default=0,null=False)
-    image = models.ImageField(upload_to=custom_upload_to)
+    image = models.ImageField(upload_to=custom_upload_to, blank=True, null=True, default ='')
+    
+class ProImage(models.Model):
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to=custom_upload_to, blank=True, null=True)
