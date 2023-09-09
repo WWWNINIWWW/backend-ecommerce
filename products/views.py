@@ -1,4 +1,4 @@
-from products.models import Products
+from products.models import Products,ProImage
 from products.serializers import ProductsSerializer
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
@@ -30,6 +30,10 @@ class ProductsDetail(generics.RetrieveUpdateDestroyAPIView):
 @receiver(pre_delete, sender=Products)
 def before_delete_user(sender, instance, **kwargs):
     try:
+        product_images = ProImage.objects.filter(product=instance)
+        for image in product_images:
+            image.image.delete(save=False)
+            image.delete()
         product_id = instance.product_id
         orders = Order.objects.all()
         for order in orders:
