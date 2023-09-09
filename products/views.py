@@ -34,11 +34,9 @@ def before_delete_user(sender, instance, **kwargs):
         for image in product_images:
             image.image.delete(save=False)
             image.delete()
-        product_id = instance.product_id
-        orders = Order.objects.all()
+        orders = Order.objects.filter(product_id=instance.product_id)
         for order in orders:
-            if order.product_id == product_id:
-                order.delete()
-        return order
+            order.delete()
+        
     except:
         pass
