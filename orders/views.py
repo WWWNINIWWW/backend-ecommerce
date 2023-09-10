@@ -64,21 +64,7 @@ class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
 class FeedbacksList(generics.ListCreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    def create(self, request, *args, **kwargs):
-        product_id = self.request.data.get('product_id')
-        consumer_id = self.request.data.get('consumer_id')
-        get_object_or_404(Products,product_id=product_id)
-        get_object_or_404(User,user_id=consumer_id)
-        feedbacks_product = Feedback.objects.filter(product_id=product_id,consumer_id=consumer_id)
-        if feedbacks_product.first() != None:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        assessment = int(self.request.data.get('assessment'))
-        if assessment >=0 and assessment <=5:
-            feedback_data = {field: value for field, value in self.request.data.items()}
-            feedback = Feedback.objects.create(**feedback_data)
-            serializer = self.get_serializer(feedback)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
 class FeedbacksDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer

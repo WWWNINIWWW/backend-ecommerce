@@ -1,5 +1,8 @@
 from django.db import models
 
+def custom_upload_to(instance, filename):
+    return f'media/feedback/{filename}'
+
 class Order(models.Model):
     order_id = models.IntegerField(unique=True,null=False)
     seller_id = models.IntegerField(null=False)
@@ -22,3 +25,8 @@ class Feedback(models.Model):
     product_id = models.IntegerField(null=False)
     assessment = models.DecimalField(default=0.0,decimal_places=1,max_digits=2)
     comentary = models.TextField(default="", null=False)
+    image = models.ImageField(upload_to=custom_upload_to, blank=True, null=True, default ='')
+    
+class FeedbackImage(models.Model):
+    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to=custom_upload_to, blank=True, null=True)
