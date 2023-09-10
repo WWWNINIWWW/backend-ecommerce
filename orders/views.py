@@ -1,4 +1,4 @@
-from orders.models import Order, Feedback
+from orders.models import Order, Feedback, FeedbackImage
 from orders.serializers import OrderSerializer, FeedbackSerializer
 from rest_framework import generics,status
 from django.shortcuts import get_object_or_404
@@ -6,7 +6,7 @@ from users.models import User
 from products.models import Products
 from django.utils import timezone
 from datetime import timedelta,datetime
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from rest_framework.response import Response
 
@@ -130,3 +130,13 @@ def after_save_order(sender, instance, created, **kwargs):
         product.quantity-=1
         product.save()
         return product
+
+@receiver(pre_delete, sender=Feedback)
+def before_delete_user(sender, instance, **kwargs):
+    try:
+        feedback_images = FeedbackImage.objects.filter(feedback=instance)
+        for image in feedback_images:
+            image.image.delete(save=False)
+            image.delete()  
+    except:
+        pass
