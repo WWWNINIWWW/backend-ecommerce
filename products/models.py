@@ -1,7 +1,7 @@
 from django.db import models
 
 def custom_upload_to(instance, filename):
-    return f'media/{instance.product.product_id}-{filename}'
+    return f'media/products/{instance.product.product_id}-{filename}'
 
 class Products(models.Model):
     name_product = models.CharField(max_length=255)
