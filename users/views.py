@@ -1,4 +1,4 @@
-from users.models import User, Cart
+from users.models import Cart, User
 from users.serializers import UserSerializer, CartSerializer
 from rest_framework import generics,status
 from django.shortcuts import get_object_or_404
@@ -8,6 +8,38 @@ from products.models import Products
 from orders.models import Order
 from rest_framework.response import Response
 
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
+
+@api_view(['POST'])
+def signup(request):
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        user = User.objects.get(username=request.data['username'])
+        user.set_password(request.data['password'])
+        user.save()
+        token = Token.objects.create(user=user)
+        return Response({'token': token.key, 'user': serializer.data})
+    return Response(serializer.errors, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def login(request):
+    user = get_object_or_404(User, username=request.data['username'])
+    if not user.check_password(request.data['password']):
+        return Response("missing user", status=status.HTTP_404_NOT_FOUND)
+    token, created = Token.objects.get_or_create(user=user)
+    serializer = UserSerializer(user)
+    return Response({'token': token.key, 'user': serializer.data})
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def test_token(request):
+    return Response("passed!")
+
 class UserListAndCreate(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -16,13 +48,15 @@ class UserDetailChangeAndDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     def get_object(self):
-        user_id = self.kwargs['user_id']
-        user = get_object_or_404(User,user_id=user_id)
+        user_id = self.kwargs['id']
+        user = get_object_or_404(User,id=user_id)
         return user
     
 class CartList(generics.ListAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+    #authentication_classes = [SessionAuthentication, TokenAuthentication]
+    #permission_classes = [IsAuthenticated]
     
 class CartDetailChangeAndDelete(generics.RetrieveAPIView):
     queryset = Cart.objects.all()
@@ -66,7 +100,7 @@ class CartProductRemove(generics.UpdateAPIView):
 @receiver(pre_delete, sender=User)
 def before_delete_user(sender, instance, **kwargs):
     try:
-        user_id = instance.user_id
+        user_id = instance.id
         products = Products.objects.filter(user_id=user_id)
         orders = Order.objects.all()
         for product in products:
@@ -81,5 +115,5 @@ def before_delete_user(sender, instance, **kwargs):
 @receiver(post_save, sender=User)
 def after_save_user(sender, instance, created, **kwargs):
     if created:
-        cart = Cart.objects.create(user_id=instance.user_id)
+        cart = Cart.objects.create(user_id=instance.id)
         return cart

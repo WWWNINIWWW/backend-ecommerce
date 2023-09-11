@@ -2,7 +2,6 @@ from products.models import Products,ProImage
 from products.serializers import ProductsSerializer
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
-from users.models import User
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete
 from orders.models import Order,Feedback

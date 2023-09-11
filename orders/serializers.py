@@ -40,7 +40,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
         product_id = self.initial_data.get('product_id')
         consumer_id = self.initial_data.get('consumer_id')
         generics.get_object_or_404(Products,product_id=product_id)
-        generics.get_object_or_404(User,user_id=consumer_id)
+        generics.get_object_or_404(User,id=consumer_id)
         feedbacks_product = Feedback.objects.filter(product_id=product_id,consumer_id=consumer_id)
         if feedbacks_product.first() != None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)

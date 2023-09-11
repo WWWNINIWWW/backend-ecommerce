@@ -18,8 +18,8 @@ class OrdersList(generics.ListCreateAPIView):
         consumer_id = self.request.data.get('consumer_id')
         product_id = self.request.data.get('product_id')
         quantity_buy = self.request.data.get('quantity_buy')
-        generics.get_object_or_404(User, user_id=seller_id)
-        generics.get_object_or_404(User, user_id=consumer_id)
+        generics.get_object_or_404(User, id=seller_id)
+        generics.get_object_or_404(User, id=consumer_id)
         generics.get_object_or_404(Products, product_id=product_id)
         product = Products.objects.get(product_id=product_id)
         if product.quantity < int(quantity_buy) or product.quantity <=0:

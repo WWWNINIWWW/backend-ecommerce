@@ -22,7 +22,7 @@ class ProductsSerializer(serializers.ModelSerializer):
     
     def create(self, validaded_data):
         user_id = self.initial_data.get('user_id')
-        generics.get_object_or_404(User, user_id=user_id)
+        generics.get_object_or_404(User, id=user_id)
         uploaded_images = validaded_data.pop("uploaded_images")
         product = Products.objects.create(**validaded_data)
         for image in uploaded_images:
