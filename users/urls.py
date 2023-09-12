@@ -1,11 +1,11 @@
 from django.urls import path
-from users.views import UserListAndCreate,UserDetailChangeAndDelete, CartList,CartDetailChangeAndDelete, CartProductAdd,CartProductRemove
+from users.views import UserList,UserDetailChangeAndDelete, CartList,CartDetailChangeAndDelete, CartProductAdd,CartProductRemove
 from django.urls import re_path
 from users import views
 
 
 urlpatterns = [
-    path('',UserListAndCreate.as_view()),
+    path('',UserList.as_view()),
     path('<int:id>/',UserDetailChangeAndDelete.as_view()),
     path('cart/', CartList.as_view()),
     path('cart/<int:user_id>/',CartDetailChangeAndDelete.as_view()),

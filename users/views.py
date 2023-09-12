@@ -7,11 +7,11 @@ from django.dispatch import receiver
 from products.models import Products
 from orders.models import Order
 from rest_framework.response import Response
-
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
+from users.permissions import IsOwner_User, IsOwner_Cart, IsOwner_CartADDandRemove
 
 @api_view(['POST'])
 def signup(request):
@@ -40,13 +40,17 @@ def login(request):
 def test_token(request):
     return Response("passed!")
 
-class UserListAndCreate(generics.ListCreateAPIView):
+class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_User]
     
 class UserDetailChangeAndDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_User]
     def get_object(self):
         user_id = self.kwargs['id']
         user = get_object_or_404(User,id=user_id)
@@ -55,12 +59,14 @@ class UserDetailChangeAndDelete(generics.RetrieveUpdateDestroyAPIView):
 class CartList(generics.ListAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    #authentication_classes = [SessionAuthentication, TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAdminUser]
     
 class CartDetailChangeAndDelete(generics.RetrieveAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_Cart]
     def get_object(self):
         user_id = self.kwargs['user_id']
         cart = get_object_or_404(Cart,user_id=user_id)
@@ -69,6 +75,8 @@ class CartDetailChangeAndDelete(generics.RetrieveAPIView):
 class CartProductAdd(generics.UpdateAPIView):
     queryset=Cart.objects.all()
     serializer_class = CartSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_CartADDandRemove]
     def put(self, request, *args, **kwargs):
         user_id = self.kwargs['user_id']
         product_id = self.kwargs['product_id']
@@ -85,6 +93,8 @@ class CartProductAdd(generics.UpdateAPIView):
 class CartProductRemove(generics.UpdateAPIView):
     queryset=Cart.objects.all()
     serializer_class = CartSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_CartADDandRemove]
     def put(self, request, *args, **kwargs):
         user_id = self.kwargs['user_id']
         product_id = self.kwargs['product_id']
