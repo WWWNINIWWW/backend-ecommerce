@@ -1,7 +1,5 @@
 from rest_framework import permissions
-from users.models import User
 from rest_framework.authtoken.models import Token
-from django.shortcuts import get_object_or_404
 
 class IsOwner_User(permissions.BasePermission):
     def has_permission(self, request, view):
