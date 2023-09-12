@@ -7,14 +7,20 @@ from django.db.models.signals import pre_delete
 from orders.models import Order,Feedback
 from django.db.models import Sum
 from decimal import Decimal, ROUND_HALF_UP
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from products.permissions import IsOwner_ProductDetail, isOwner_Product
 
 class ProductsList(generics.ListCreateAPIView):
     queryset = Products.objects.all()
     serializer_class = ProductsSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [isOwner_Product]
 
 class ProductsDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Products.objects.all()
     serializer_class = ProductsSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_ProductDetail]
     def get_object(self):
         product_id = self.kwargs['product_id']
         product = get_object_or_404(Products,product_id=product_id)
