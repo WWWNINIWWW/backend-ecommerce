@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'users',
     'products',
     'orders',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +63,7 @@ TEMPLATES = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 10
 }
 
@@ -123,3 +125,11 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'backend-ecommerce',
+    'DESCRIPTION': '',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
