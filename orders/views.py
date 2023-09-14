@@ -9,10 +9,14 @@ from datetime import timedelta,datetime
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from orders.permissions import *
 
 class OrdersList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_Order]
     def create(self, request, *args, **kwargs):
         seller_id = self.request.data.get('seller_id')
         consumer_id = self.request.data.get('consumer_id')
@@ -35,6 +39,8 @@ class OrdersList(generics.ListCreateAPIView):
 class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_OrderDetail]
     def get_object(self):
         order_id = self.kwargs['order_id']
         order = get_object_or_404(Order,order_id=order_id)
