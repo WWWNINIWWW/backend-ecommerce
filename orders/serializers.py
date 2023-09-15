@@ -16,7 +16,7 @@ class OrderSerializer(serializers.ModelSerializer):
     seller_id = serializers.ReadOnlyField()
     consumer_id = serializers.ReadOnlyField()
     product_id = serializers.ReadOnlyField()
-    
+    order_id = serializers.ReadOnlyField()
     class Meta:
         model = Order
         fields = ['order_id','seller_id','consumer_id','product_id','zip_code_fate','price_fate','price_total','quantity_buy','deadline','posted','tracking_code','concluded','created_at','modified_at']
