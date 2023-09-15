@@ -4,6 +4,8 @@ from products.models import Products
 
 class IsOwner_ProductDetail(permissions.BasePermission):
     def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return True
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.auth:
@@ -17,6 +19,8 @@ class IsOwner_ProductDetail(permissions.BasePermission):
     
 class isOwner_Product(permissions.BasePermission):
     def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return True
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.auth:
