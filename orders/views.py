@@ -70,10 +70,15 @@ class OrdersDetail(generics.RetrieveUpdateDestroyAPIView):
 class FeedbacksList(generics.ListCreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_Feedback]
     
 class FeedbacksDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsOwner_FeedbackDetail]
+    
     def get_object(self):
         feedback_id = self.kwargs['feedback_id']
         feedback = get_object_or_404(Feedback,feedback_id=feedback_id)
