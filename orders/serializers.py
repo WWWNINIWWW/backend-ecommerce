@@ -27,6 +27,7 @@ class FeedbackImageSerializer(serializers.ModelSerializer):
         fields = ['image']
         
 class FeedbackSerializer(serializers.ModelSerializer):
+    feedback_id = serializers.ReadOnlyField()
     images = FeedbackImageSerializer(many=True, read_only=True)
     uploaded_images = serializers.ListField(
         child = serializers.ImageField(max_length = 1000000, allow_empty_file=False, use_url=False),
@@ -48,7 +49,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
         if assessment >=0 and assessment <=5:
             if self.initial_data.get('uploaded_images'):
                 uploaded_images = validaded_data.pop("uploaded_images")
-            feedback = Feedback.objects.create(**validaded_data)
+            feedback = Feedback.objects.create(feedback_id=self.context.get('feedback_id'),**validaded_data)
             try:
                 for image in uploaded_images:
                     newproduct_image = FeedbackImage.objects.create(feedback=feedback,image=image)

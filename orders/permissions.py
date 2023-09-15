@@ -64,7 +64,7 @@ class IsOwner_FeedbackDetail(permissions.BasePermission):
                 if feedback.consumer_id == user_id_token:
                     return True
             elif request.method == 'PUT':
-                feedback = get_object_or_404(Feedback,feedback_id=int(request.data.get('feedback_id')))
+                feedback = get_object_or_404(Feedback,feedback_id=view.kwargs.get('feedback_id'))
                 if feedback.consumer_id == user_id_token and user_id_token == int(request.data.get('consumer_id')):
                     return True
         return False
