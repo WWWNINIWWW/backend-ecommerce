@@ -72,14 +72,6 @@ class FeedbacksList(generics.ListCreateAPIView):
     serializer_class = FeedbackSerializer
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsOwner_Feedback]
-    def create(self, request, *args, **kwargs):
-        feedback_id = request.data.get('feedback_id')
-        serializer = FeedbackSerializer(data=request.data,context={'feedback_id':int(feedback_id)})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'error':'não foi possivel criar o feedback'})
     
 class FeedbacksDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Feedback.objects.all()

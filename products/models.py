@@ -6,7 +6,7 @@ def custom_upload_to(instance, filename):
 class Products(models.Model):
     name_product = models.CharField(max_length=255)
     user_id = models.IntegerField(null=False)
-    product_id = models.IntegerField(unique=True,null=False)
+    product_id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     price = models.DecimalField(default=0.00,decimal_places=2,max_digits=20)

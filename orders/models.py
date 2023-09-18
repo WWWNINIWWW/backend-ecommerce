@@ -4,7 +4,7 @@ def custom_upload_to(instance, filename):
     return f'media/feedback/{filename}'
 
 class Order(models.Model):
-    order_id = models.IntegerField(unique=True,null=False)
+    order_id = models.AutoField(primary_key=True)
     seller_id = models.IntegerField(null=False)
     consumer_id = models.IntegerField(null=False)
     product_id = models.IntegerField(null=False)
@@ -20,7 +20,7 @@ class Order(models.Model):
     tracking_code = models.TextField(default="")
 
 class Feedback(models.Model):
-    feedback_id = models.IntegerField(unique=True)
+    feedback_id = models.AutoField(primary_key=True)
     consumer_id = models.IntegerField(null=False)
     product_id = models.IntegerField(null=False)
     assessment = models.DecimalField(default=0.0,decimal_places=1,max_digits=2)
