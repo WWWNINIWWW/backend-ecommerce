@@ -56,6 +56,22 @@ class UserDetailChangeAndDelete(generics.RetrieveUpdateDestroyAPIView):
         user = get_object_or_404(User,id=user_id)
         return user
     
+    def update(self, request, *args, **kwargs):
+        user = self.request.user
+        new_password = request.data.get('password')
+        if new_password is not None:
+            serializer = self.get_serializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+            user.set_password(new_password)
+            user.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            serializer = self.get_serializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
 class CartList(generics.ListAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
