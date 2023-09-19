@@ -2,7 +2,7 @@ from users.models import Cart, User
 from users.serializers import UserSerializer, CartSerializer
 from rest_framework import generics,status
 from django.shortcuts import get_object_or_404
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import pre_delete, post_save, pre_save
 from django.dispatch import receiver
 from products.models import Products
 from orders.models import Order
@@ -12,6 +12,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
 from users.permissions import IsOwner_User, IsOwner_Cart, IsOwner_CartADDandRemove
+import os
 
 @api_view(['POST'])
 def signup(request):
@@ -59,6 +60,12 @@ class UserDetailChangeAndDelete(generics.RetrieveUpdateDestroyAPIView):
     def update(self, request, *args, **kwargs):
         user = self.request.user
         new_password = request.data.get('password')
+        new_image = request.data.get('image')
+        if new_image:
+            if user.image and not user.image.name.endswith('defaultProfile.jpg') and not user.image == new_image:
+                old_image_path = user.image.path
+                if os.path.isfile(old_image_path):
+                    os.remove(old_image_path)
         if new_password is not None:
             serializer = self.get_serializer(user, data=request.data, partial=True)
             if serializer.is_valid():
@@ -129,6 +136,10 @@ def before_delete_user(sender, instance, **kwargs):
         user_id = instance.id
         products = Products.objects.filter(user_id=user_id)
         orders = Order.objects.all()
+        if instance.image and not instance.image.name.endswith('defaultProfile.jpg'):
+            image_path = instance.image.path
+            if os.path.isfile(image_path):
+                os.remove(image_path)
         for product in products:
             product.delete()
         for order in orders:
@@ -143,3 +154,16 @@ def after_save_user(sender, instance, created, **kwargs):
     if created:
         cart = Cart.objects.create(user_id=instance.id)
         return cart
+    
+@receiver(pre_save, sender=User)
+def delete_previous_image(sender, instance, **kwargs):
+    if instance.pk:
+        try:
+            user = User.objects.get(pk=instance.pk)
+            if user.image:
+                if not user.image.name.endswith('defaultProfile.jpg') and not user.image == instance.image:
+                    old_image_path = user.image.path
+                    if os.path.isfile(old_image_path):
+                        os.remove(old_image_path)
+        except User.DoesNotExist:
+            pass
